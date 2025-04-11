@@ -1,17 +1,17 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
+	"github.com/gofiber/fiber/v2"
 )
 
 func (app *application) serve() error {
-	fmt.Println("Logged in")
-	srv := &http.Server{
-		Handler: nil,
-		Addr:    ":4000",
-	}
-	err := srv.ListenAndServe()
+	srv := fiber.New()
+
+	srv.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Hello, World!")
+	})
+
+	err := srv.Listen(":3000")
 	if err != nil {
 		return err
 	}
