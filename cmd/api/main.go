@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/rs/zerolog"
 	"os"
 )
@@ -15,4 +16,9 @@ func main() {
 		logger: &logger,
 	}
 	app.logger.Info().Msg("Hello World")
+	err := app.serve()
+	if err != nil {
+		fmt.Println(err)
+	}
+
 }
