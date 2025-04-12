@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
+	"flag"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	"os"
@@ -21,9 +22,12 @@ type config struct {
 }
 
 func main() {
-	logger := zerolog.New(os.Stdout)
+
 	var cfg config
-	cfg.db.dsn = "postgres://postgres:picpay123@localhost/picpay?sslmode=disable"
+	flag.StringVar(&cfg.db.dsn, "db-dsn", "", "PostgreSQL DSN")
+	flag.Parse()
+
+	logger := zerolog.New(os.Stdout)
 
 	db, err := openDB(cfg)
 	if err != nil {
