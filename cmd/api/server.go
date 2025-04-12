@@ -10,9 +10,7 @@ func (app *application) serve() error {
 
 	srv.Use(logger.New())
 
-	srv.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello World")
-	})
+	srv.Post("api/v1/users", app.registerUserHandler)
 
 	//srv.Use(middleware.Logger())
 	//router.SetupRoutes(srv)
