@@ -38,3 +38,21 @@ db/migrations/new:
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
 	migrate -path ./migrations -database ${PICPAY_DB_DSN} up
+
+## db/migrations/down: rollback all up database migrations
+.PHONY: db/migrations/down
+db/migrations/down: confirm
+	@echo 'Rolling back all migrations...'
+	migrate -path ./migrations -database ${PICPAY_DB_DSN} down
+
+## db/migrations/goto version=$1: Go to a specific version of database
+.PHONY: db/migrations/goto
+db/migrations/goto: confirm
+	@echo 'Going to version ${version} of database'
+	migrate -path ./migrations -database ${PICPAY_DB_DSN} goto ${version}
+
+## db/migrations/force version=$1: force command on migrate
+.PHONY: db/migrations/force
+db/migrations/force: confirm
+	@echo 'Forcing migration to version ${version}'
+	migrate -path ./migrations -database ${PICPAY_DB_DSN} force ${version}
