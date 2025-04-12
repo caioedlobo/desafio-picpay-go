@@ -28,7 +28,7 @@ run/api: docker/up
 	go run ./cmd/api --db-dsn=${PICPAY_DB_DSN}
 
 ## db/migration/new name=$1: create a new database migration
-.PHONY: db/migrations/up
+.PHONY: db/migrations/new
 db/migrations/new:
 	@echo 'Creating migration files for ${name}...'
 	migrate create -seq -ext=.sql -dir=./migrations ${name}
