@@ -37,4 +37,4 @@ db/migrations/new:
 .PHONY: db/migrations/up
 db/migrations/up: confirm
 	@echo 'Running up migrations...'
-	migrate -path ./migrations -database ${PICPAY_DB_DSN}
+	migrate -path ./migrations -database ${PICPAY_DB_DSN} up
