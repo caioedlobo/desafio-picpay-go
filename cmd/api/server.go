@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 )
@@ -20,4 +22,10 @@ func (app *application) serve() error {
 		return err
 	}
 	return nil
+}
+func (app *application) strictBodyParser(c *fiber.Ctx, dst any) error {
+	body := c.Request().Body()
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.DisallowUnknownFields()
+	return decoder.Decode(dst)
 }
