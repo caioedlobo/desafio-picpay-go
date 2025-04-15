@@ -3,6 +3,8 @@ package validator
 import "regexp"
 
 var EmailRX = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
+var CpfRegex = regexp.MustCompile(`^\d{11}$`)
+var CnpjRegex = regexp.MustCompile(`^\d{14}$`)
 
 type Validator struct {
 	Errors map[string]string
