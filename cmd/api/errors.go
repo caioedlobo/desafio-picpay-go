@@ -8,9 +8,15 @@ func (app *application) errorResponse(c *fiber.Ctx, status int, message any) err
 	c.Status(status)
 	err := c.JSON(fiber.Map{"error": message})
 	if err != nil {
+		app.logger.Error().Msg(err.Error())
 		c.Status(fiber.StatusInternalServerError)
 	}
 	return err
+}
+
+func (app *application) serverErrorResponse(c *fiber.Ctx, err error) error {
+	app.logger.Error().Msg(err.Error())
+	return app.errorResponse(c, fiber.StatusInternalServerError, err.Error())
 }
 
 func (app *application) badRequestResponse(c *fiber.Ctx, err error) error {
