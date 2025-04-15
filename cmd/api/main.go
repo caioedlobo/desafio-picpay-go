@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"github.com/caioedlobo/desafio-picpay-go/cmd/internal/data"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog"
 	"os"
@@ -13,6 +14,7 @@ import (
 type application struct {
 	logger *zerolog.Logger
 	config config
+	models data.Models
 }
 
 type config struct {
@@ -27,7 +29,7 @@ func main() {
 	flag.StringVar(&cfg.db.dsn, "db-dsn", "", "PostgreSQL DSN")
 	flag.Parse()
 
-	logger := zerolog.New(os.Stdout)
+	logger := zerolog.New(os.Stdout).Level(zerolog.InfoLevel)
 
 	db, err := openDB(cfg)
 	if err != nil {
@@ -40,6 +42,7 @@ func main() {
 	app := &application{
 		logger: &logger,
 		config: cfg,
+		models: data.NewModels(db),
 	}
 
 	err = app.serve()
