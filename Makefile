@@ -24,7 +24,7 @@ docker/up:
 
 ## run/api: run the cmd/api application
 .PHONY: run/api
-run/api: docker/up
+run/api:
 	go run ./cmd/api --db-dsn=${PICPAY_DB_DSN}
 
 ## db/migration/new name=$1: create a new database migration
