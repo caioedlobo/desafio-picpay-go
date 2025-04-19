@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"strconv"
 )
 
 func (app *application) serve() error {
@@ -17,7 +18,7 @@ func (app *application) serve() error {
 	//srv.Use(middleware.Logger())
 	//router.SetupRoutes(srv)
 
-	err := srv.Listen(":3000")
+	err := srv.Listen(strconv.Itoa(app.config.port))
 	if err != nil {
 		return err
 	}

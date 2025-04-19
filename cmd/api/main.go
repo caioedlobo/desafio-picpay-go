@@ -18,7 +18,8 @@ type application struct {
 }
 
 type config struct {
-	db struct {
+	port int
+	db   struct {
 		dsn string
 	}
 }
@@ -26,6 +27,7 @@ type config struct {
 func main() {
 
 	var cfg config
+	flag.IntVar(&cfg.port, "port", 3000, "API server port")
 	flag.StringVar(&cfg.db.dsn, "db-dsn", "", "PostgreSQL DSN")
 	flag.Parse()
 
