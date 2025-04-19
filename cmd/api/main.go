@@ -11,6 +11,10 @@ import (
 	"time"
 )
 
+var (
+	version string
+)
+
 type application struct {
 	logger *zerolog.Logger
 	config config

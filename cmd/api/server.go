@@ -17,12 +17,13 @@ func (app *application) serve() error {
 		srv.Use(limiter.New())
 	}
 
+	srv.Get("api/v1/healthcheck", app.healthcheckHandler)
 	srv.Post("api/v1/users", app.registerUserHandler)
 
 	//srv.Use(middleware.Logger())
 	//router.SetupRoutes(srv)
 
-	err := srv.Listen(strconv.Itoa(app.config.port))
+	err := srv.Listen(":" + strconv.Itoa(app.config.port))
 	if err != nil {
 		return err
 	}
