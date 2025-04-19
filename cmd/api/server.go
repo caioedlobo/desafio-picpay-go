@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"strconv"
 )
@@ -12,6 +13,9 @@ func (app *application) serve() error {
 	srv := fiber.New()
 
 	srv.Use(logger.New())
+	if app.config.limiter {
+		srv.Use(limiter.New())
+	}
 
 	srv.Post("api/v1/users", app.registerUserHandler)
 
