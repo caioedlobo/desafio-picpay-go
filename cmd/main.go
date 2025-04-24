@@ -23,7 +23,7 @@ func main() {
 
 	userRepo := persistence.NewPostgresUserRepository(db)
 	eventStore := eventstore.NewPostgresEventStore(db)
-	commandHandler := handlers.NewCommandHandler(*userRepo, *eventStore)
+	commandHandler := handlers.NewCommandHandler(userRepo, eventStore)
 	httpHandler := api.NewHTTPHandler(commandHandler)
 
 	app := fiber.New()

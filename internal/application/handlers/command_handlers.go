@@ -6,18 +6,16 @@ import (
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/commands"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
-	"github.com/caioedlobo/desafio-picpay-go/internal/infrastructure/eventstore"
-	"github.com/caioedlobo/desafio-picpay-go/internal/infrastructure/persistence"
 	"github.com/google/uuid"
 	"strconv"
 )
 
 type CommandHandler struct {
-	userRepo   persistence.PostgresUserRepository
-	eventStore eventstore.PostgresEventStore
+	userRepo   user.UserRepository
+	eventStore event.EventRepository
 }
 
-func NewCommandHandler(userRepo persistence.PostgresUserRepository, eventStore eventstore.PostgresEventStore) *CommandHandler {
+func NewCommandHandler(userRepo user.UserRepository, eventStore event.EventRepository) *CommandHandler {
 	return &CommandHandler{
 		userRepo:   userRepo,
 		eventStore: eventStore,
