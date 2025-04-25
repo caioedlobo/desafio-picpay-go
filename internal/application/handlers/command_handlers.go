@@ -11,14 +11,14 @@ import (
 )
 
 type CommandHandler struct {
-	userRepo   user.UserRepository
-	eventStore event.EventRepository
+	userRepo  user.UserRepository
+	eventRepo event.EventRepository
 }
 
 func NewCommandHandler(userRepo user.UserRepository, eventStore event.EventRepository) *CommandHandler {
 	return &CommandHandler{
-		userRepo:   userRepo,
-		eventStore: eventStore,
+		userRepo:  userRepo,
+		eventRepo: eventStore,
 	}
 }
 func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.CreateUserCommand) (int64, error) {
@@ -56,7 +56,7 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 	}
 	// TODO:
 	// Salvar evento
-	if err = h.eventStore.AppendEvent(ctx, ev); err != nil {
+	if err = h.eventRepo.AppendEvent(ctx, ev); err != nil {
 		return 0, err
 	}
 
