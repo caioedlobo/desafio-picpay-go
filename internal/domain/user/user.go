@@ -2,22 +2,8 @@ package user
 
 import (
 	"errors"
-	"regexp"
 	"time"
 )
-
-const (
-	CPF  DocumentType = "cpf"
-	CNPJ DocumentType = "cnpj"
-)
-
-var (
-	EmailRX   = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
-	CpfRegex  = regexp.MustCompile(`^\d{11}$`)
-	CnpjRegex = regexp.MustCompile(`^\d{14}$`)
-)
-
-type DocumentType string
 
 type Password struct {
 	plaintext *string
@@ -27,9 +13,9 @@ type Password struct {
 type User struct {
 	ID             int64
 	Name           string
-	DocumentNumber string
+	DocumentNumber DocumentNumber
 	DocumentType   DocumentType
-	Email          string
+	Email          Email
 	Password       string
 	CreatedAt      time.Time
 }
@@ -43,10 +29,6 @@ func NewUser(name string, documentNumber string, password string, documentType D
 		return nil, errors.New("número do documento não pode ser vazio")
 	}
 
-	if email == "" {
-		return nil, errors.New("email não pode ser vazio")
-	}
-
 	if password == "" {
 		return nil, errors.New("senha não pode ser vazia")
 	}
@@ -57,9 +39,9 @@ func NewUser(name string, documentNumber string, password string, documentType D
 
 	u := &User{
 		Name:           name,
-		DocumentNumber: documentNumber,
+		DocumentNumber: DocumentNumber(documentNumber), // Assuming it's a string type
 		DocumentType:   documentType,
-		Email:          email,
+		Email:          validatedEmail,
 		Password:       password,
 		CreatedAt:      time.Now(),
 	}
