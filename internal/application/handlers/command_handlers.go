@@ -27,32 +27,38 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 	}
 
 	docType := user.DocumentType(cmd.DocumentType)
-	user, err := user.NewUser(cmd.Name, cmd.DocumentNumber, cmd.Password, docType, cmd.Email)
+
+	pass, err := user.NewPassword(cmd.Password)
 	if err != nil {
 		return 0, err
 	}
 
-	if err = h.userRepo.Save(ctx, user); err != nil {
+	u, err := user.NewUser(cmd.Name, cmd.DocumentNumber, *pass, docType, cmd.Email)
+	if err != nil {
+		return 0, err
+	}
+
+	if err = h.userRepo.Save(ctx, u); err != nil {
 		return 0, err
 	}
 
 	// Criar evento
 	userData, _ := json.Marshal(map[string]any{
-		"id":              user.ID,
-		"name":            user.Name,
-		"document_number": user.DocumentNumber,
-		"document_type":   user.DocumentType,
-		"email":           user.Email,
-		"created_at":      user.CreatedAt,
+		"id":              u.ID,
+		"name":            u.Name,
+		"document_number": u.DocumentNumber,
+		"document_type":   u.DocumentType,
+		"email":           u.Email,
+		"created_at":      u.CreatedAt,
 	})
 
 	ev := &event.Event{
 		ID:          uuid.New().String(),
 		Type:        event.UserCreated,
 		Data:        userData,
-		Timestamp:   user.CreatedAt,
+		Timestamp:   u.CreatedAt,
 		Version:     1,
-		AggregateID: strconv.FormatInt(user.ID, 10),
+		AggregateID: strconv.FormatInt(u.ID, 10),
 	}
 	// TODO:
 	// Salvar evento
@@ -60,5 +66,5 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 		return 0, err
 	}
 
-	return user.ID, nil
+	return u.ID, nil
 }
