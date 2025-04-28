@@ -7,17 +7,18 @@ import (
 	"errors"
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/commands"
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/handlers"
-	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 type HTTPHandler struct {
 	commandHandler *handlers.CommandHandler
 	//queryHandler   *handlers.QueryHandler
+	validator *validator.Validate
 }
 
-func NewHTTPHandler(commandHandler *handlers.CommandHandler) *HTTPHandler {
-	return &HTTPHandler{commandHandler: commandHandler}
+func NewHTTPHandler(commandHandler *handlers.CommandHandler, validator *validator.Validate) *HTTPHandler {
+	return &HTTPHandler{commandHandler: commandHandler, validator: validator}
 }
 
 func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
@@ -27,22 +28,9 @@ func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
 		return handlers.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	if _, err := user.ValidEmail(createInput.Email); err != nil {
-		return handlers.BadRequestErrorResponse(c, handlers.ErrEmailNotValid.Error())
-	}
-
-	if _, err := user.ValidName(createInput.Name); err != nil {
-		return handlers.BadRequestErrorResponse(c, handlers.ErrEmailNotValid.Error())
-	}
-
-	if _, err := user.ValidPassword(createInput.Name); err != nil {
-		return handlers.BadRequestErrorResponse(c, handlers.ErrEmailNotValid.Error())
-	}
-	if _, err := user.ValidDocumentNumber(createInput.Name); err != nil {
-		return handlers.BadRequestErrorResponse(c, handlers.ErrEmailNotValid.Error())
-	}
-	if _, err := user.ValidDocumentType(createInput.Name); err != nil {
-		return handlers.BadRequestErrorResponse(c, handlers.ErrEmailNotValid.Error())
+	err = h.validator.Struct(createInput)
+	if err != nil {
+		return handlers.BadRequestErrorResponse(c, err.Error())
 	}
 
 	id, err := h.commandHandler.HandleCreateUser(context.Background(), createInput)
