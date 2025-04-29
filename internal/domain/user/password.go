@@ -22,3 +22,7 @@ func (p *Password) Set(plaintext string) ([]byte, error) {
 	}
 	return hash, nil
 }
+
+func (p *Password) GetHash() []byte {
+	return p.hash
+}

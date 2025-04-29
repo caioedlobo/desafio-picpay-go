@@ -3,6 +3,7 @@ package persistence
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
 )
 
@@ -30,7 +31,7 @@ func (r *PostgresUserRepository) Save(ctx context.Context, user *user.User) erro
 		user.DocumentNumber,
 		user.DocumentType,
 		user.Email,
-		user.Password,
+		user.Password.GetHash(),
 		user.CreatedAt,
 	).Scan(&user.ID)
 
@@ -56,16 +57,14 @@ func (r *PostgresUserRepository) FindByID(ctx context.Context, id int64) (*user.
 		&passwordHash,
 		&user.CreatedAt,
 	)
-
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
-
 	if err != nil {
-		return nil, err
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, nil
+		default:
+			return nil, err
+		}
 	}
-
-	//user.Password = model.Password{hash: passwordHash}
 
 	return &user, nil
 }
