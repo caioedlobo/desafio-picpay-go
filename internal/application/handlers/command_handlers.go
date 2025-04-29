@@ -53,7 +53,7 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 	})
 
 	ev := &event.Event{
-		ID:          uuid.New().String(),
+		ID:          uuid.New(),
 		Type:        event.UserCreated,
 		Data:        userData,
 		Timestamp:   u.CreatedAt,

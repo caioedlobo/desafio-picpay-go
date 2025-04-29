@@ -1,6 +1,9 @@
 package event
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 const (
 	UserCreated EventType = "USER_CREATED"
@@ -11,7 +14,7 @@ const (
 type EventType string
 
 type Event struct {
-	ID          string    `json:"id"`
+	ID          uuid.UUID `json:"id"`
 	Type        EventType `json:"type"`
 	Data        []byte    `json:"data"`
 	Timestamp   time.Time `json:"timestamp"`
