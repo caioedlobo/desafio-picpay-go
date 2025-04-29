@@ -1,1 +1,3 @@
 DROP TABLE IF EXISTS users;
+DROP TYPE IF EXISTS document_type_enum;
+DROP EXTENSION IF EXISTS citext;
