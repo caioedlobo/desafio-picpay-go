@@ -13,12 +13,15 @@ import (
 
 type HTTPHandler struct {
 	commandHandler *handlers.CommandHandler
-	//queryHandler   *handlers.QueryHandler
-	validator *validator.Validate
+	queryHandler   *handlers.QueryHandler
+	validator      *validator.Validate
 }
 
-func NewHTTPHandler(commandHandler *handlers.CommandHandler, validator *validator.Validate) *HTTPHandler {
-	return &HTTPHandler{commandHandler: commandHandler, validator: validator}
+func NewHTTPHandler(commandHandler *handlers.CommandHandler, queryHandler *handlers.QueryHandler, validator *validator.Validate) *HTTPHandler {
+	return &HTTPHandler{
+		commandHandler: commandHandler,
+		queryHandler:   queryHandler,
+		validator:      validator}
 }
 
 func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
