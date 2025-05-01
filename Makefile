@@ -2,7 +2,7 @@
 # HELPERS
 # ==================================================================================== #
 
-### help: print this help message
+## help: print this help message
 .PHONY: help
 help:
 	@echo 'Usage:'
@@ -16,7 +16,7 @@ confirm:
 # DEVELOPMENT
 # ==================================================================================== #
 
-### docker/up: start the docker container on docker-compose.yml
+## docker/up: start the docker container on docker-compose.yml
 .PHONY: docker/up
 docker/up:
 	start "Docker Desktop" "C:\Program Files\Docker\Docker\Docker Desktop.exe"
