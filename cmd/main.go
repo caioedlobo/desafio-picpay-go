@@ -25,8 +25,9 @@ func main() {
 	userRepo := persistence.NewPostgresUserRepository(db)
 	eventStore := eventstore.NewPostgresEventStore(db)
 	commandHandler := handlers.NewCommandHandler(userRepo, eventStore)
+	queryHandler := handlers.NewQueryHandler(userRepo)
 	validate := validator.New(validator.WithRequiredStructEnabled())
-	httpHandler := api.NewHTTPHandler(commandHandler, validate)
+	httpHandler := api.NewHTTPHandler(commandHandler, queryHandler, validate)
 
 	app := fiber.New()
 	app.Use(log.New())
