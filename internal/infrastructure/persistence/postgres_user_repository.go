@@ -19,8 +19,8 @@ func NewPostgresUserRepository(db *sql.DB) *PostgresUserRepository {
 
 func (r *PostgresUserRepository) Save(ctx context.Context, user *user.User) error {
 	query := `
-        INSERT INTO users (name, document_number, document_type, email, password_hash, created_at)
-        VALUES ($1, $2, $3, $4, $5, $6)
+        INSERT INTO users (name, document_number, document_type, email, password_hash, created_at, balance)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id
     `
 
@@ -33,6 +33,7 @@ func (r *PostgresUserRepository) Save(ctx context.Context, user *user.User) erro
 		user.Email,
 		user.Password.GetHash(),
 		user.CreatedAt,
+		user.Balance,
 	).Scan(&user.ID)
 
 	return err

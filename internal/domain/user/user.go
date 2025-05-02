@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"github.com/bojanz/currency"
 	"time"
 )
 
@@ -12,6 +13,7 @@ type User struct {
 	DocumentType   DocumentType
 	Email          Email
 	Password       Password
+	Balance        currency.Amount
 	CreatedAt      time.Time
 }
 
@@ -31,13 +33,18 @@ func NewUser(name string, documentNumber string, password Password, documentType
 	if documentType == "" {
 		return nil, errors.New("tipo de documento não pode ser vazio")
 	}
+	balance, err := currency.NewAmount("0.0", "BRL")
+	if err != nil {
+		return nil, err
+	}
 
 	u := &User{
 		Name:           name,
-		DocumentNumber: DocumentNumber(documentNumber), // Assuming it's a string type
+		DocumentNumber: DocumentNumber(documentNumber),
 		DocumentType:   documentType,
 		Email:          Email(email),
 		Password:       password,
+		Balance:        balance,
 		CreatedAt:      time.Now(),
 	}
 	return u, nil
