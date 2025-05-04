@@ -2,7 +2,11 @@ package user
 
 import (
 	"errors"
+	"fmt"
 	"github.com/bojanz/currency"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
+	"strconv"
 	"time"
 )
 
@@ -15,6 +19,7 @@ type User struct {
 	Password       Password
 	Balance        currency.Amount
 	CreatedAt      time.Time
+	Aggregate      *domain.Aggregate
 }
 
 func NewUser(name string, documentNumber string, password Password, documentType DocumentType, email string) (*User, error) {
@@ -47,5 +52,14 @@ func NewUser(name string, documentNumber string, password Password, documentType
 		Balance:        balance,
 		CreatedAt:      time.Now(),
 	}
+	u.Aggregate = domain.NewAggregate(strconv.Itoa(int(u.ID)), "user", u.ApplyEvent)
 	return u, nil
+}
+
+func (u *User) ApplyEvent(ev *event.Event) {
+	switch ev.Type {
+	case event.UserCreated:
+	default:
+		panic(fmt.Sprintf("unknown event: %s", ev.Type))
+	}
 }

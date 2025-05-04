@@ -6,8 +6,6 @@ import (
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/commands"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
-	"github.com/google/uuid"
-	"strconv"
 )
 
 type CommandHandler struct {
@@ -52,17 +50,9 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 		"created_at":      u.CreatedAt,
 	})
 
-	ev := &event.Event{
-		ID:          uuid.New(),
-		Type:        event.UserCreated,
-		Data:        userData,
-		Timestamp:   u.CreatedAt,
-		Version:     1,
-		AggregateID: strconv.FormatInt(u.ID, 10),
-	}
-	// TODO:
-	// Salvar evento
-	if err = h.eventRepo.AppendEvent(ctx, ev); err != nil {
+	u.Aggregate.AddEvent(event.UserCreated, userData)
+
+	if err = h.eventRepo.AppendEvent(ctx, u.Aggregate.Events()); err != nil {
 		return 0, err
 	}
 

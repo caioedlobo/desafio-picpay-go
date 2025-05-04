@@ -2,37 +2,57 @@ package eventstore
 
 import (
 	"context"
-	"database/sql"
+	"fmt"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type PostgresEventStore struct {
-	db *sql.DB
+	db *pgxpool.Pool
 }
 
-func NewPostgresEventStore(db *sql.DB) *PostgresEventStore {
+func NewPostgresEventStore(db *pgxpool.Pool) *PostgresEventStore {
 	return &PostgresEventStore{
 		db: db,
 	}
 }
 
-func (s *PostgresEventStore) AppendEvent(ctx context.Context, event *event.Event) error {
-	query := `
-        INSERT INTO events (id, type, data, timestamp, version, aggregate_id)
-        VALUES ($1, $2, $3, $4, $5, $6)
-    `
+func (s *PostgresEventStore) AppendEvent(ctx context.Context, ev []*event.Event) error {
 
-	_, err := s.db.ExecContext(
+	if len(ev) == 0 {
+		return fmt.Errorf("no events to save")
+	}
+	eventsDuplicateMap := make(map[event.EventType]struct{})
+	for _, v := range ev {
+		if _, exists := eventsDuplicateMap[v.Type]; exists {
+			return fmt.Errorf("duplicate event found: %v", v.Type)
+		} else {
+			eventsDuplicateMap[v.Type] = struct{}{}
+		}
+	}
+
+	rows := make([][]any, len(ev))
+	for i, ev := range ev {
+		rows[i] = []any{
+			ev.ID,
+			ev.Type,
+			ev.Data,
+			ev.Timestamp,
+			ev.Version,
+			ev.AggregateID,
+		}
+	}
+
+	_, err := s.db.CopyFrom(
 		ctx,
-		query,
-		event.ID,
-		event.Type,
-		event.Data,
-		event.Timestamp,
-		event.Version,
-		event.AggregateID,
+		pgx.Identifier{"events"},
+		[]string{"id", "type", "data", "timestamp", "version", "aggregate_id"},
+		pgx.CopyFromRows(rows),
 	)
-
+	if err != nil {
+		return fmt.Errorf("failed to copy events: %w", err)
+	}
 	return err
 }
 
@@ -44,33 +64,34 @@ func (s *PostgresEventStore) GetEvents(ctx context.Context, aggregateID string) 
         ORDER BY version ASC
     `
 
-	rows, err := s.db.QueryContext(ctx, query, aggregateID)
+	rows, err := s.db.Query(ctx, query, aggregateID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to query events: %w", err)
 	}
 	defer rows.Close()
 
 	var events []*event.Event
 
 	for rows.Next() {
-		var event event.Event
+		var ev event.Event
 
-		if err := rows.Scan(
-			&event.ID,
-			&event.Type,
-			&event.Data,
-			&event.Timestamp,
-			&event.Version,
-			&event.AggregateID,
-		); err != nil {
-			return nil, err
+		err := rows.Scan(
+			&ev.ID,
+			&ev.Type,
+			&ev.Data,
+			&ev.Timestamp,
+			&ev.Version,
+			&ev.AggregateID,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan event: %w", err)
 		}
 
-		events = append(events, &event)
+		events = append(events, &ev)
 	}
 
-	if err := rows.Err(); err != nil {
-		return nil, err
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("row iteration error: %w", rows.Err())
 	}
 
 	return events, nil

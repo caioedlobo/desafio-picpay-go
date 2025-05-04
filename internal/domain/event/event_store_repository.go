@@ -1,8 +1,10 @@
 package event
 
-import "context"
+import (
+	"context"
+)
 
 type EventRepository interface {
-	AppendEvent(ctx context.Context, event *Event) error
+	AppendEvent(ctx context.Context, ev []*Event) error
 	GetEvents(ctx context.Context, aggregateID string) ([]*Event, error)
 }
