@@ -1,4 +1,4 @@
-package commands
+package command
 
 type UpdateUserCommand struct {
 	ID    int64  `json:"id"`

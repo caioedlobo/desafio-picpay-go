@@ -3,7 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
-	"github.com/caioedlobo/desafio-picpay-go/internal/application/commands"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/command"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/dto"
@@ -21,7 +21,7 @@ func NewCommandHandler(userRepo user.UserRepository, eventStore event.EventRepos
 		eventRepo: eventStore,
 	}
 }
-func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.CreateUserCommand) (int64, error) {
+func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd command.CreateUserCommand) (int64, error) {
 	if existingUser, _ := h.userRepo.FindByEmail(ctx, cmd.Email); existingUser != nil {
 		return 0, ErrEmailAlreadyExists
 	}

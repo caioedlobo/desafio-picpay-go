@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/caioedlobo/desafio-picpay-go/internal/application/commands"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/command"
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/handlers"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
@@ -25,7 +25,7 @@ func NewHTTPHandler(commandHandler *handlers.CommandHandler, queryHandler *handl
 }
 
 func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
-	createInput := commands.CreateUserCommand{}
+	createInput := command.CreateUserCommand{}
 	err := readJSON(c, &createInput)
 	if err != nil {
 		return handlers.ErrorResponse(c, fiber.StatusBadRequest, err.Error())

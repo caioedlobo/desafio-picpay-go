@@ -1,4 +1,4 @@
-package commands
+package command
 
 type CreateUserCommand struct {
 	Name           string `json:"name" validate:"required"`
