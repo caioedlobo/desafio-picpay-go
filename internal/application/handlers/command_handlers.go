@@ -6,6 +6,8 @@ import (
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/commands"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/dto"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
 )
 
 type CommandHandler struct {
@@ -24,9 +26,9 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 		return 0, ErrEmailAlreadyExists
 	}
 
-	docType := user.DocumentType(cmd.DocumentType)
+	docType := value_object.DocumentType(cmd.DocumentType)
 
-	pass, err := user.NewPassword(cmd.Password)
+	pass, err := value_object.NewPassword(cmd.Password)
 	if err != nil {
 		return 0, err
 	}
@@ -40,17 +42,8 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd commands.Crea
 		return 0, err
 	}
 
-	// Criar evento
-	userData, _ := json.Marshal(map[string]any{
-		"id":              u.ID,
-		"name":            u.Name,
-		"document_number": u.DocumentNumber,
-		"document_type":   u.DocumentType,
-		"email":           u.Email,
-		"created_at":      u.CreatedAt,
-	})
-
-	u.Aggregate.AddEvent(event.UserCreated, userData)
+	createUser, _ := json.Marshal(dto.NewCreateUser(u))
+	u.Aggregate.AddEvent(event.UserCreated, createUser)
 
 	if err = h.eventRepo.AppendEvent(ctx, u.Aggregate.Events()); err != nil {
 		return 0, err
