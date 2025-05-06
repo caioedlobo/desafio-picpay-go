@@ -6,6 +6,7 @@ import (
 	"github.com/bojanz/currency"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
 	"strconv"
 	"time"
 )
@@ -13,16 +14,16 @@ import (
 type User struct {
 	ID             int64
 	Name           string
-	DocumentNumber DocumentNumber
-	DocumentType   DocumentType
-	Email          Email
-	Password       Password
+	DocumentNumber value_object.DocumentNumber
+	DocumentType   value_object.DocumentType
+	Email          value_object.Email
+	Password       value_object.Password
 	Balance        currency.Amount
 	CreatedAt      time.Time
 	Aggregate      *domain.Aggregate
 }
 
-func NewUser(name string, documentNumber string, password Password, documentType DocumentType, email string) (*User, error) {
+func NewUser(name string, documentNumber string, password value_object.Password, documentType value_object.DocumentType, email string) (*User, error) {
 	if name == "" {
 		return nil, errors.New("nome não pode ser vazio")
 	}
@@ -31,7 +32,7 @@ func NewUser(name string, documentNumber string, password Password, documentType
 		return nil, errors.New("número do documento não pode ser vazio")
 	}
 
-	if password.plaintext == nil {
+	if password.GetPlaintext() == nil {
 		return nil, errors.New("senha não pode ser vazia")
 	}
 
@@ -45,9 +46,9 @@ func NewUser(name string, documentNumber string, password Password, documentType
 
 	u := &User{
 		Name:           name,
-		DocumentNumber: DocumentNumber(documentNumber),
+		DocumentNumber: value_object.DocumentNumber(documentNumber),
 		DocumentType:   documentType,
-		Email:          Email(email),
+		Email:          value_object.Email(email),
 		Password:       password,
 		Balance:        balance,
 		CreatedAt:      time.Now(),

@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
 )
 
 type PostgresUserRepository struct {
@@ -103,7 +104,7 @@ func (r *PostgresUserRepository) FindByEmail(ctx context.Context, email string) 
 	return &user, nil
 }
 
-func (r *PostgresUserRepository) FindByDocument(ctx context.Context, documentNumber string, documentType user.DocumentType) (*user.User, error) {
+func (r *PostgresUserRepository) FindByDocument(ctx context.Context, documentNumber string, documentType value_object.DocumentType) (*user.User, error) {
 	query := `
         SELECT id, name, document_number, document_type, email, password_hash, created_at
         FROM users

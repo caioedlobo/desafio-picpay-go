@@ -1,4 +1,4 @@
-package user
+package value_object
 
 import "golang.org/x/crypto/bcrypt"
 
@@ -25,4 +25,8 @@ func (p *Password) Set(plaintext string) ([]byte, error) {
 
 func (p *Password) GetHash() []byte {
 	return p.hash
+}
+
+func (p *Password) GetPlaintext() *string {
+	return p.plaintext
 }
