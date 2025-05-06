@@ -1,4 +1,4 @@
-package queries
+package query
 
 type GetUserByIDQuery struct {
 	ID int64 `json:"id"`
