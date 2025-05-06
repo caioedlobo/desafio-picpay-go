@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"database/sql"
-	"github.com/caioedlobo/desafio-picpay-go/internal/application/handlers"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/handler"
 	"github.com/caioedlobo/desafio-picpay-go/internal/infrastructure/api"
 	"github.com/caioedlobo/desafio-picpay-go/internal/infrastructure/eventstore"
 	"github.com/caioedlobo/desafio-picpay-go/internal/infrastructure/persistence"
@@ -31,8 +31,8 @@ func main() {
 
 	userRepo := persistence.NewPostgresUserRepository(db)
 	eventStore := eventstore.NewPostgresEventStore(dbpool)
-	commandHandler := handlers.NewCommandHandler(userRepo, eventStore)
-	queryHandler := handlers.NewQueryHandler(userRepo)
+	commandHandler := handler.NewCommandHandler(userRepo, eventStore)
+	queryHandler := handler.NewQueryHandler(userRepo)
 	validate := validator.New(validator.WithRequiredStructEnabled())
 	httpHandler := api.NewHTTPHandler(commandHandler, queryHandler, validate)
 

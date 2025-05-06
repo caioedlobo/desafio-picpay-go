@@ -6,18 +6,18 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/command"
-	"github.com/caioedlobo/desafio-picpay-go/internal/application/handlers"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/handler"
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
 type HTTPHandler struct {
-	commandHandler *handlers.CommandHandler
-	queryHandler   *handlers.QueryHandler
+	commandHandler *handler.CommandHandler
+	queryHandler   *handler.QueryHandler
 	validator      *validator.Validate
 }
 
-func NewHTTPHandler(commandHandler *handlers.CommandHandler, queryHandler *handlers.QueryHandler, validator *validator.Validate) *HTTPHandler {
+func NewHTTPHandler(commandHandler *handler.CommandHandler, queryHandler *handler.QueryHandler, validator *validator.Validate) *HTTPHandler {
 	return &HTTPHandler{
 		commandHandler: commandHandler,
 		queryHandler:   queryHandler,
@@ -28,21 +28,21 @@ func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
 	createInput := command.CreateUserCommand{}
 	err := readJSON(c, &createInput)
 	if err != nil {
-		return handlers.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
+		return handler.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
 	err = h.validator.Struct(createInput)
 	if err != nil {
-		return handlers.BadRequestErrorResponse(c, err.Error())
+		return handler.BadRequestErrorResponse(c, err.Error())
 	}
 
 	id, err := h.commandHandler.HandleCreateUser(context.Background(), createInput)
 	if err != nil {
 		switch {
-		case errors.Is(err, handlers.ErrEmailAlreadyExists):
-			return handlers.FailedValidationErrorResponse(c, handlers.ErrEmailAlreadyExists.Error())
+		case errors.Is(err, handler.ErrEmailAlreadyExists):
+			return handler.FailedValidationErrorResponse(c, handler.ErrEmailAlreadyExists.Error())
 		default:
-			return handlers.ServerErrorResponse(c, err)
+			return handler.ServerErrorResponse(c, err)
 		}
 	}
 	return c.JSON(id)

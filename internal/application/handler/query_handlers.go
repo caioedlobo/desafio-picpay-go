@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import "github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
 
