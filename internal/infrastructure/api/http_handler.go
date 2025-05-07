@@ -45,6 +45,11 @@ func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
 			return handler.ServerErrorResponse(c, err)
 		}
 	}
+
+	err = c.SendStatus(fiber.StatusCreated)
+	if err != nil {
+		return err
+	}
 	return c.JSON(id)
 
 }

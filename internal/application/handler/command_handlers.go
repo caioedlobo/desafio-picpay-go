@@ -52,5 +52,5 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd command.Creat
 		return "", err
 	}
 
-	return "Ok", nil
+	return "user created successfully", nil
 }
