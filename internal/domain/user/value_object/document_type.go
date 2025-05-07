@@ -11,7 +11,7 @@ const (
 
 type DocumentType string
 
-func (e DocumentType) New(value string) (DocumentType, error) {
+func NewDocumentType(value string) (DocumentType, error) {
 	if ok, err := ValidDocumentType(value); !ok {
 		return "", err
 	}
