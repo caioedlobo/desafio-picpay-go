@@ -1,7 +1,7 @@
 package command
 
 type UpdateUserCommand struct {
-	ID    int64  `json:"id"`
+	ID    string `json:"id"`
 	Name  string `json:"name"`
 	Email string `json:"email"`
 }

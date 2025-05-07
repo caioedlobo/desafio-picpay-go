@@ -3,11 +3,12 @@ package dto
 import (
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
+	"github.com/google/uuid"
 	"time"
 )
 
 type CreateUser struct {
-	ID             int64                       `json:"id"`
+	ID             uuid.UUID                   `json:"id"`
 	Name           string                      `json:"name"`
 	DocumentNumber value_object.DocumentNumber `json:"document_number"`
 	DocumentType   value_object.DocumentType   `json:"document_type"`

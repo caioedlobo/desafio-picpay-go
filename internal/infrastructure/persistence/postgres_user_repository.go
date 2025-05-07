@@ -20,14 +20,15 @@ func NewPostgresUserRepository(db *sql.DB) *PostgresUserRepository {
 
 func (r *PostgresUserRepository) Save(ctx context.Context, user *user.User) error {
 	query := `
-        INSERT INTO users (name, document_number, document_type, email, password_hash, created_at, balance)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        INSERT INTO users (id, name, document_number, document_type, email, password_hash, created_at, balance)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
         RETURNING id
     `
 
 	err := r.db.QueryRowContext(
 		ctx,
 		query,
+		user.ID,
 		user.Name,
 		user.DocumentNumber,
 		user.DocumentType,

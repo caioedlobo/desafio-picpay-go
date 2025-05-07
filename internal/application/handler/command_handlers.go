@@ -21,33 +21,36 @@ func NewCommandHandler(userRepo user.UserRepository, eventStore event.EventRepos
 		eventRepo: eventStore,
 	}
 }
-func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd command.CreateUserCommand) (int64, error) {
+func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd command.CreateUserCommand) (string, error) {
 	if existingUser, _ := h.userRepo.FindByEmail(ctx, cmd.Email); existingUser != nil {
-		return 0, ErrEmailAlreadyExists
+		return "", ErrEmailAlreadyExists
 	}
 
-	docType := value_object.DocumentType(cmd.DocumentType)
+	docType, err := value_object.NewDocumentType(cmd.DocumentType)
+	if err != nil {
+		return "", err
+	}
 
 	pass, err := value_object.NewPassword(cmd.Password)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	u, err := user.NewUser(cmd.Name, cmd.DocumentNumber, *pass, docType, cmd.Email)
 	if err != nil {
-		return 0, err
+		return "", err
 	}
 
 	if err = h.userRepo.Save(ctx, u); err != nil {
-		return 0, err
+		return "", err
 	}
 
 	createUser, _ := json.Marshal(dto.NewCreateUser(u))
 	u.Aggregate.AddEvent(event.UserCreated, createUser)
 
 	if err = h.eventRepo.AppendEvent(ctx, u.Aggregate.Events()); err != nil {
-		return 0, err
+		return "", err
 	}
 
-	return u.ID, nil
+	return "Ok", nil
 }

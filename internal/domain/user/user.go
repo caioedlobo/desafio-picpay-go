@@ -7,12 +7,12 @@ import (
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
-	"strconv"
+	"github.com/google/uuid"
 	"time"
 )
 
 type User struct {
-	ID             int64
+	ID             uuid.UUID
 	Name           string
 	DocumentNumber value_object.DocumentNumber
 	DocumentType   value_object.DocumentType
@@ -45,6 +45,7 @@ func NewUser(name string, documentNumber string, password value_object.Password,
 	}
 
 	u := &User{
+		ID:             uuid.New(),
 		Name:           name,
 		DocumentNumber: value_object.DocumentNumber(documentNumber),
 		DocumentType:   documentType,
@@ -53,7 +54,7 @@ func NewUser(name string, documentNumber string, password value_object.Password,
 		Balance:        balance,
 		CreatedAt:      time.Now(),
 	}
-	u.Aggregate = domain.NewAggregate(strconv.Itoa(int(u.ID)), "user", u.ApplyEvent)
+	u.Aggregate = domain.NewAggregate(u.ID.String(), "user", u.ApplyEvent)
 	return u, nil
 }
 
