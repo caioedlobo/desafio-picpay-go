@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 	"fmt"
+	"github.com/caioedlobo/desafio-picpay-go/internal/domain"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -56,7 +57,7 @@ func (s *PostgresEventStore) AppendEvent(ctx context.Context, ev []*event.Event)
 	return err
 }
 
-func (s *PostgresEventStore) GetEvents(ctx context.Context, aggregateID string) ([]*event.Event, error) {
+func (s *PostgresEventStore) Get(ctx context.Context, aggregateID string) (event.EventSourcedAggregate, error) {
 	query := `
         SELECT id, type, data, timestamp, version, aggregate_id
         FROM events
@@ -70,12 +71,11 @@ func (s *PostgresEventStore) GetEvents(ctx context.Context, aggregateID string) 
 	}
 	defer rows.Close()
 
-	var events []*event.Event
-
+	ag := domain.NewAggregate(aggregateID, nil)
 	for rows.Next() {
 		var ev event.Event
 
-		err := rows.Scan(
+		err = rows.Scan(
 			&ev.ID,
 			&ev.Type,
 			&ev.Data,
@@ -87,12 +87,12 @@ func (s *PostgresEventStore) GetEvents(ctx context.Context, aggregateID string) 
 			return nil, fmt.Errorf("failed to scan event: %w", err)
 		}
 
-		events = append(events, &ev)
+		ag.ApplyEvent(&ev)
 	}
 
 	if rows.Err() != nil {
 		return nil, fmt.Errorf("row iteration error: %w", rows.Err())
 	}
 
-	return events, nil
+	return ag, nil
 }
