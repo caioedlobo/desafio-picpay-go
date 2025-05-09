@@ -9,19 +9,17 @@ import (
 
 type Aggregate struct {
 	id         string
-	name       string
 	events     []*event.Event
-	applyEvent func(event2 *event.Event)
+	applyEvent func(*event.Event)
 	version    int
 }
 
-func NewAggregate(id string, name string, applyEventFunc func(ev *event.Event)) *Aggregate {
+func NewAggregate(id string, applyEventFunc func(ev *event.Event)) *Aggregate {
 	if applyEventFunc == nil {
 		applyEventFunc = func(ev *event.Event) {}
 	}
 	return &Aggregate{
 		id:         id,
-		name:       name,
 		events:     make([]*event.Event, 0),
 		applyEvent: applyEventFunc,
 	}
@@ -31,9 +29,9 @@ func (a *Aggregate) ID() string {
 	return a.id
 }
 
-func (a *Aggregate) Name() string {
+/*func (a *Aggregate) Name() string {
 	return a.name
-}
+}*/
 
 func (a *Aggregate) Version() int {
 	return a.version
@@ -45,6 +43,11 @@ func (a *Aggregate) PendingVersion() int {
 
 func (a *Aggregate) Events() []*event.Event {
 	return a.events
+}
+
+func (a *Aggregate) Commit() {
+	a.version = a.PendingVersion()
+	a.events = make([]*event.Event, 0)
 }
 
 func (a *Aggregate) ApplyEvent(event *event.Event) {
@@ -62,4 +65,16 @@ func (a *Aggregate) AddEvent(eventType event.EventType, data []byte) {
 	}
 	a.events = append(a.events, ev)
 	a.ApplyEvent(ev)
+}
+
+func (a *Aggregate) SetID(value string) {
+	a.id = value
+}
+
+func (a *Aggregate) SetName(value string) {
+	a.id = value
+}
+
+func (a *Aggregate) SetVersion(value int) {
+	a.version = value
 }

@@ -1,6 +1,7 @@
 package user
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/bojanz/currency"
@@ -54,13 +55,24 @@ func NewUser(name string, documentNumber string, password value_object.Password,
 		Balance:        balance,
 		CreatedAt:      time.Now(),
 	}
-	u.Aggregate = domain.NewAggregate(u.ID.String(), "user", u.ApplyEvent)
+	u.Aggregate = domain.NewAggregate(u.ID.String(), u.ApplyEvent)
 	return u, nil
 }
 
 func (u *User) ApplyEvent(ev *event.Event) {
+	eventData := &User{}
+	err := json.Unmarshal(ev.Data, &eventData)
+	if err != nil {
+		return
+	}
+
 	switch ev.Type {
 	case event.UserCreated:
+		u.Name = eventData.Name
+		u.Email = eventData.Email
+		u.DocumentType = eventData.DocumentType
+		u.DocumentNumber = eventData.DocumentNumber
+		u.Password = eventData.Password
 	default:
 		panic(fmt.Sprintf("unknown event: %s", ev.Type))
 	}

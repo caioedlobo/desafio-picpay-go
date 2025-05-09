@@ -21,3 +21,15 @@ type Event struct {
 	Version     int       `json:"version"`
 	AggregateID string    `json:"aggregate_id"`
 }
+
+type EventSourcedAggregate interface {
+	ID() string
+	Events() []*Event
+	//Name() string
+	Commit()
+	ApplyEvent(*Event)
+
+	SetID(string)
+	SetName(string)
+	SetVersion(int)
+}
