@@ -54,15 +54,15 @@ func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
 
 }
 
-func (h *HTTPHandler) UpdateUser(c *fiber.Ctx) error {
-	updateInput := command.UpdateUserCommand{}
+func (h *HTTPHandler) UpdateUserName(c *fiber.Ctx) error {
+	updateInput := command.UpdateUserNameCommand{}
 	updateInput.ID = c.Params("id")
 	err := readJSON(c, &updateInput)
 	if err != nil {
 		return handler.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	err = h.commandHandler.HandleUpdateUser(context.Background(), updateInput)
+	err = h.commandHandler.HandleUpdateUserName(context.Background(), updateInput)
 	if err != nil {
 		switch {
 		case errors.Is(err, handler.ErrEmailAlreadyExists):

@@ -3,9 +3,7 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/caioedlobo/desafio-picpay-go/internal/application/command"
-	"github.com/caioedlobo/desafio-picpay-go/internal/domain"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
@@ -56,20 +54,12 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd command.Creat
 	return nil
 }
 
-func (h *CommandHandler) HandleUpdateUser(ctx context.Context, cmd command.UpdateUserCommand) error {
-	existingUser, err := h.userRepo.FindByID(ctx, cmd.ID)
-	if err != nil {
+func (h *CommandHandler) HandleUpdateUserName(ctx context.Context, cmd command.UpdateUserNameCommand) error {
+	if existingUser, _ := h.userRepo.FindByID(ctx, cmd.ID); existingUser == nil {
 		return ErrEmailAlreadyExists
 	}
 
-	if cmd.Name != "" {
-		existingUser.Name = cmd.Name
-	}
-	if cmd.Email != "" {
-		existingUser.Email = value_object.Email(cmd.Email)
-	}
-
-	err = h.userRepo.Update(ctx, existingUser)
+	err := h.userRepo.UpdateName(ctx, cmd)
 	if err != nil {
 		return err
 	}
@@ -79,19 +69,14 @@ func (h *CommandHandler) HandleUpdateUser(ctx context.Context, cmd command.Updat
 		return err
 	}
 
-	if domainAggregate, ok := agg.(*domain.Aggregate); ok {
-		existingUser.Aggregate = domainAggregate
-	} else {
-		return fmt.Errorf("erro ao converter EventSourcedAggregate para *domain.Aggregate")
-	}
-
 	dto, err := json.Marshal(cmd)
 	if err != nil {
 		return err
 	}
-	existingUser.Aggregate.AddEvent(event.UserUpdated, dto)
 
-	err = h.eventRepo.AppendEvent(ctx, existingUser.Aggregate.Events())
+	agg.AddEvent(event.UserNameUpdated, dto)
+
+	err = h.eventRepo.AppendEvent(ctx, agg.Events())
 	if err != nil {
 		return err
 	}

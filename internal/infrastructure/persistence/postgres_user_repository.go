@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/command"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
 )
@@ -138,19 +139,18 @@ func (r *PostgresUserRepository) FindByDocument(ctx context.Context, documentNum
 	return &user, nil
 }
 
-func (r *PostgresUserRepository) Update(ctx context.Context, user *user.User) error {
+func (r *PostgresUserRepository) UpdateName(ctx context.Context, cmd command.UpdateUserNameCommand) error {
 	query := `
         UPDATE users
-        SET name = $1, email = $2
-        WHERE id = $3
+        SET name = $1
+        WHERE id = $2
     `
 
 	_, err := r.db.ExecContext(
 		ctx,
 		query,
-		user.Name,
-		user.Email,
-		user.ID,
+		cmd.Name,
+		cmd.ID,
 	)
 
 	return err

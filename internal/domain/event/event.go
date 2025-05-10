@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	UserCreated EventType = "USER_CREATED"
-	UserUpdated EventType = "USER_UPDATED"
-	UserDeleted EventType = "USER_DELETED"
+	UserCreated     EventType = "USER_CREATED"
+	UserNameUpdated EventType = "USER_NAME_UPDATED"
+	UserDeleted     EventType = "USER_DELETED"
 )
 
 type EventType string
@@ -32,4 +32,5 @@ type EventSourcedAggregate interface {
 	SetID(string)
 	SetName(string)
 	SetVersion(int)
+	AddEvent(eventType EventType, data []byte)
 }

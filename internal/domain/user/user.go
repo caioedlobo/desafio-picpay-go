@@ -68,14 +68,14 @@ func (u *User) ApplyEvent(ev *event.Event) {
 
 	switch ev.Type {
 	case event.UserCreated:
+		u.ID = eventData.ID
 		u.Name = eventData.Name
 		u.Email = eventData.Email
 		u.DocumentType = eventData.DocumentType
 		u.DocumentNumber = eventData.DocumentNumber
 		u.Password = eventData.Password
-	case event.UserUpdated:
+	case event.UserNameUpdated:
 		u.Name = eventData.Name
-		u.Email = eventData.Email
 	default:
 		panic(fmt.Sprintf("unknown event: %s", ev.Type))
 	}

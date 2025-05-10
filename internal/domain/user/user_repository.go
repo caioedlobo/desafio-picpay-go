@@ -2,6 +2,7 @@ package user
 
 import (
 	"context"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/command"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/user/value_object"
 )
 
@@ -10,6 +11,6 @@ type UserRepository interface {
 	FindByID(ctx context.Context, id string) (*User, error)
 	FindByEmail(ctx context.Context, email string) (*User, error)
 	FindByDocument(ctx context.Context, documentNumber string, documentType value_object.DocumentType) (*User, error)
-	Update(ctx context.Context, user *User) error
+	UpdateName(ctx context.Context, cmd command.UpdateUserNameCommand) error
 	Delete(ctx context.Context, id int64) error
 }
