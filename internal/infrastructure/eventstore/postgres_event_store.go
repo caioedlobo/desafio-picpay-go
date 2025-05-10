@@ -3,6 +3,7 @@ package eventstore
 import (
 	"context"
 	"fmt"
+	"github.com/caioedlobo/desafio-picpay-go/internal/application/handler"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain"
 	"github.com/caioedlobo/desafio-picpay-go/internal/domain/event"
 	"github.com/jackc/pgx/v5"
@@ -72,7 +73,10 @@ func (s *PostgresEventStore) Get(ctx context.Context, aggregateID string) (event
 	defer rows.Close()
 
 	ag := domain.NewAggregate(aggregateID, nil)
+
+	var rowFound bool
 	for rows.Next() {
+		rowFound = true
 		var ev event.Event
 
 		err = rows.Scan(
@@ -92,6 +96,9 @@ func (s *PostgresEventStore) Get(ctx context.Context, aggregateID string) (event
 
 	if rows.Err() != nil {
 		return nil, fmt.Errorf("row iteration error: %w", rows.Err())
+	}
+	if !rowFound {
+		return nil, handler.ErrNoRecordFound
 	}
 
 	return ag, nil
