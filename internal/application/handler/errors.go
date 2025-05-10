@@ -10,6 +10,7 @@ var (
 	ErrEmailAlreadyExists = errors.New("email já está em uso")
 	ErrInternalServer     = errors.New("ocorreu um erro inesperado")
 	ErrEmailNotValid      = errors.New("email não é válido")
+	ErrNoRecordFound      = errors.New("nenhum registro encontrado")
 )
 
 func ErrorResponse(c *fiber.Ctx, status int, message any) error {
@@ -31,4 +32,8 @@ func BadRequestErrorResponse(c *fiber.Ctx, message string) error {
 
 func FailedValidationErrorResponse(c *fiber.Ctx, message string) error {
 	return ErrorResponse(c, fiber.StatusUnprocessableEntity, message)
+}
+
+func NotFoundErrorResponse(c *fiber.Ctx, message string) error {
+	return ErrorResponse(c, fiber.StatusNotFound, message)
 }
