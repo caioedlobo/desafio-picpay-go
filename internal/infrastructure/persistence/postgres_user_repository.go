@@ -41,7 +41,7 @@ func (r *PostgresUserRepository) Save(ctx context.Context, user *user.User) erro
 	return err
 }
 
-func (r *PostgresUserRepository) FindByID(ctx context.Context, id int64) (*user.User, error) {
+func (r *PostgresUserRepository) FindByID(ctx context.Context, id string) (*user.User, error) {
 	query := `
         SELECT id, name, document_number, document_type, email, password_hash, created_at
         FROM users

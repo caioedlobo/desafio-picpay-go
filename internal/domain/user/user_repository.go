@@ -7,7 +7,7 @@ import (
 
 type UserRepository interface {
 	Save(ctx context.Context, user *User) error
-	FindByID(ctx context.Context, id int64) (*User, error)
+	FindByID(ctx context.Context, id string) (*User, error)
 	FindByEmail(ctx context.Context, email string) (*User, error)
 	FindByDocument(ctx context.Context, documentNumber string, documentType value_object.DocumentType) (*User, error)
 	Update(ctx context.Context, user *User) error
