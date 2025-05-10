@@ -36,7 +36,7 @@ func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
 		return handler.BadRequestErrorResponse(c, err.Error())
 	}
 
-	id, err := h.commandHandler.HandleCreateUser(context.Background(), createInput)
+	err = h.commandHandler.HandleCreateUser(context.Background(), createInput)
 	if err != nil {
 		switch {
 		case errors.Is(err, handler.ErrEmailAlreadyExists):
@@ -50,8 +50,30 @@ func (h *HTTPHandler) CreateUser(c *fiber.Ctx) error {
 	if err != nil {
 		return err
 	}
-	return c.JSON(id)
+	return c.JSON("user successfully created")
 
+}
+
+func (h *HTTPHandler) UpdateUser(c *fiber.Ctx) error {
+	updateInput := command.UpdateUserCommand{}
+	updateInput.ID = c.Params("id")
+	err := readJSON(c, &updateInput)
+	if err != nil {
+		return handler.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
+	}
+
+	err = h.commandHandler.HandleUpdateUser(context.Background(), updateInput)
+	if err != nil {
+		switch {
+		case errors.Is(err, handler.ErrEmailAlreadyExists):
+			return handler.FailedValidationErrorResponse(c, handler.ErrEmailAlreadyExists.Error())
+		case errors.Is(err, handler.ErrNoRecordFound):
+			return handler.NotFoundErrorResponse(c, handler.ErrNoRecordFound.Error())
+		default:
+			return handler.ServerErrorResponse(c, err)
+		}
+	}
+	return c.JSON("user successfully updated")
 }
 
 func readJSON(c *fiber.Ctx, dst any) error {

@@ -73,6 +73,9 @@ func (u *User) ApplyEvent(ev *event.Event) {
 		u.DocumentType = eventData.DocumentType
 		u.DocumentNumber = eventData.DocumentNumber
 		u.Password = eventData.Password
+	case event.UserUpdated:
+		u.Name = eventData.Name
+		u.Email = eventData.Email
 	default:
 		panic(fmt.Sprintf("unknown event: %s", ev.Type))
 	}

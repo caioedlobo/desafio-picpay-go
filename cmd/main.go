@@ -39,5 +39,6 @@ func main() {
 	app := fiber.New()
 	app.Use(log.New())
 	app.Post("/api/v1/users", httpHandler.CreateUser)
+	app.Put("/api/v1/users/:id", httpHandler.UpdateUser)
 	app.Listen(":3000")
 }
