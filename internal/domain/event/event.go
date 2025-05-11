@@ -32,5 +32,5 @@ type EventSourcedAggregate interface {
 	SetID(string)
 	SetName(string)
 	SetVersion(int)
-	AddEvent(eventType EventType, data []byte)
+	NewEvent(eventType EventType, data []byte)
 }

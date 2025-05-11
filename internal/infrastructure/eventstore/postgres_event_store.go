@@ -26,11 +26,11 @@ func (s *PostgresEventStore) AppendEvent(ctx context.Context, ev []*event.Event)
 		return fmt.Errorf("no events to save")
 	}
 	eventsDuplicateMap := make(map[event.EventType]struct{})
-	for _, v := range ev {
-		if _, exists := eventsDuplicateMap[v.Type]; exists {
-			return fmt.Errorf("duplicate event found: %v", v.Type)
+	for _, e := range ev {
+		if _, exists := eventsDuplicateMap[e.Type]; exists {
+			return fmt.Errorf("duplicate event found: %v", e.Type)
 		} else {
-			eventsDuplicateMap[v.Type] = struct{}{}
+			eventsDuplicateMap[e.Type] = struct{}{}
 		}
 	}
 
@@ -72,7 +72,7 @@ func (s *PostgresEventStore) Get(ctx context.Context, aggregateID string) (event
 	}
 	defer rows.Close()
 
-	ag := domain.NewAggregate(aggregateID, nil)
+	agg := domain.NewAggregate(aggregateID, nil)
 
 	var rowFound bool
 	for rows.Next() {
@@ -91,7 +91,7 @@ func (s *PostgresEventStore) Get(ctx context.Context, aggregateID string) (event
 			return nil, fmt.Errorf("failed to scan event: %w", err)
 		}
 
-		ag.ApplyEvent(&ev)
+		agg.AddEvent(&ev) //TODO: criar método para passar o evento diretamente
 	}
 
 	if rows.Err() != nil {
@@ -100,6 +100,50 @@ func (s *PostgresEventStore) Get(ctx context.Context, aggregateID string) (event
 	if !rowFound {
 		return nil, handler.ErrNoRecordFound
 	}
+	return agg, nil
+}
 
-	return ag, nil
+func (s *PostgresEventStore) Get2(ctx context.Context, aggregateID string, applyEvent func(ev *event.Event)) (event.EventSourcedAggregate, error) {
+	query := `
+        SELECT id, type, data, timestamp, version, aggregate_id
+        FROM events
+        WHERE aggregate_id = $1
+        ORDER BY version ASC
+    `
+
+	rows, err := s.db.Query(ctx, query, aggregateID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to query events: %w", err)
+	}
+	defer rows.Close()
+
+	agg := domain.NewAggregate(aggregateID, applyEvent)
+
+	var rowFound bool
+	for rows.Next() {
+		rowFound = true
+		var ev event.Event
+
+		err = rows.Scan(
+			&ev.ID,
+			&ev.Type,
+			&ev.Data,
+			&ev.Timestamp,
+			&ev.Version,
+			&ev.AggregateID,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("failed to scan event: %w", err)
+		}
+
+		agg.AddEvent(&ev) //TODO: criar método para passar o evento diretamente
+	}
+
+	if rows.Err() != nil {
+		return nil, fmt.Errorf("row iteration error: %w", rows.Err())
+	}
+	if !rowFound {
+		return nil, handler.ErrNoRecordFound
+	}
+	return agg, nil
 }

@@ -54,7 +54,7 @@ func (a *Aggregate) ApplyEvent(event *event.Event) {
 	a.applyEvent(event)
 }
 
-func (a *Aggregate) AddEvent(eventType event.EventType, data []byte) {
+func (a *Aggregate) NewEvent(eventType event.EventType, data []byte) {
 	ev := &event.Event{
 		ID:          uuid.New(),
 		Type:        eventType,
@@ -63,6 +63,11 @@ func (a *Aggregate) AddEvent(eventType event.EventType, data []byte) {
 		Version:     a.PendingVersion(),
 		AggregateID: a.ID(),
 	}
+	a.events = append(a.events, ev)
+	a.ApplyEvent(ev)
+}
+
+func (a *Aggregate) AddEvent(ev *event.Event) {
 	a.events = append(a.events, ev)
 	a.ApplyEvent(ev)
 }

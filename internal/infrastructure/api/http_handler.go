@@ -62,7 +62,8 @@ func (h *HTTPHandler) UpdateUserName(c *fiber.Ctx) error {
 		return handler.ErrorResponse(c, fiber.StatusBadRequest, err.Error())
 	}
 
-	err = h.commandHandler.HandleUpdateUserName(context.Background(), updateInput)
+	//err = h.commandHandler.HandleUpdateUserName(context.Background(), updateInput)
+	err = h.commandHandler.HandleUpdateUserName2(context.Background(), updateInput)
 	if err != nil {
 		switch {
 		case errors.Is(err, handler.ErrEmailAlreadyExists):

@@ -45,7 +45,7 @@ func (h *CommandHandler) HandleCreateUser(ctx context.Context, cmd command.Creat
 	}
 
 	dto, _ := json.Marshal(cmd)
-	u.Aggregate.AddEvent(event.UserCreated, dto)
+	u.Aggregate.NewEvent(event.UserCreated, dto)
 
 	if err = h.eventRepo.AppendEvent(ctx, u.Aggregate.Events()); err != nil {
 		return err
@@ -74,7 +74,42 @@ func (h *CommandHandler) HandleUpdateUserName(ctx context.Context, cmd command.U
 		return err
 	}
 
-	agg.AddEvent(event.UserNameUpdated, dto)
+	agg.NewEvent(event.UserNameUpdated, dto)
+
+	err = h.eventRepo.AppendEvent(ctx, agg.Events())
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (h *CommandHandler) HandleUpdateUserName2(ctx context.Context, cmd command.UpdateUserNameCommand) error {
+	existingUser, err := h.userRepo.FindByID(ctx, cmd.ID)
+	if err != nil {
+		return err
+	}
+	if existingUser == nil {
+		return ErrEmailAlreadyExists
+	}
+
+	err = h.userRepo.UpdateName(ctx, cmd)
+	if err != nil {
+		return err
+	}
+
+	agg, err := h.eventRepo.Get2(ctx, cmd.ID, existingUser.ApplyEvent)
+	if err != nil {
+		return err
+	}
+
+	dto, err := json.Marshal(cmd)
+	if err != nil {
+		return err
+	}
+
+	agg.Commit()
+	agg.NewEvent(event.UserNameUpdated, dto)
 
 	err = h.eventRepo.AppendEvent(ctx, agg.Events())
 	if err != nil {
